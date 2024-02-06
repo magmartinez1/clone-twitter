@@ -30,6 +30,6 @@ El clon de la red social Twitter está diseñada para replicar la funcionalidad 
 1. Un usuario puede dar varias respuestas a varios tweets.
 2. Cada respuesta está asociada a un solo usuario.
 
-![Diagrama de entidades](https://github.com/magmartinez1/clone-twitter/blob/main/documents/diReSN.png)
+![Diagrama de entidades](C:\Users\User\clone-twitter\documents/diReSN.png)
 
 
