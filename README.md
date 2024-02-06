@@ -1,6 +1,7 @@
 # clone-twitter
 ### Descripción
 El clon de la red social Twitter está diseñada para replicar la funcionalidad básica de la plataforma. Crear perfiles, publicar "tweets", entre otras funciones.
+## - Base de datos
 ### Entidades:
 #### \- Usuario:
 - **Descripción:**  Representa a todos los usuarios de la plataforma.
