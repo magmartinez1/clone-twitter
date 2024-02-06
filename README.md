@@ -12,6 +12,14 @@ El clon de la red social Twitter está diseñada para replicar la funcionalidad 
 5. fecha_registro: fecha en la que se registró el registro
 
 #### \- Tweet:
+- **Descripción:** Representa todos los mensajes publicados por los usuarios.
+- **Atributos:**
+1. id_tweet: identificador de la publicación.
+2. id_usuario: indentificador del usuario (clave foránea de *usuario*)
+3. texto: texto dentro de la publicación (máx 140 carácteres).
+
+### Relaciones:
+- **Publicación: Usuario /- Tweet**
 
 
 
