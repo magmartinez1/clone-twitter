@@ -20,12 +20,13 @@ El clon de la red social Twitter está diseñada para replicar la funcionalidad 
 
 ### Relaciones:
 - **Publicación: Usuario - Tweet**
--Un usuario puede aplicar varios tweets.
--Cada tweet es publicado por un solo usuario.
+\- Un usuario puede aplicar varios tweets.
+\- Cada tweet es publicado por un solo usuario.
 - **Like: Usuario - Tweet**
--Un usuario puede dar *like* a varios tweets.
--Cada *like* se asocia a un solo usuario.
+\- Un usuario puede dar *like* a varios tweets.
+\- Cada *like* se asocia a un solo usuario.
 - **Respuesta: Usuario tweet**
--Un usuario puede dar varias respuestas a varios tweets.
--Cada respuesta está asociada a un solo usuario.
+\- Un usuario puede dar varias respuestas a varios tweets.
+\- Cada respuesta está asociada a un solo usuario.
+
 
