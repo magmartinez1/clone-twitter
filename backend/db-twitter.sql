@@ -10,7 +10,7 @@ CREATE TABLE users (
 CREATE TABLE tweet (
     id_tweet SERIALIZABLE PRIMARY KEY,
     id_user VARCHAR(10),
-    message VARCHAR(140)
+    tweet_text VARCHAR(140)
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_user) REFERENCES users (id_user)
 );
@@ -22,3 +22,12 @@ CREATE TABLE likes (
     FOREIGN key (id_user) REFERENCES users (id_user),
     FOREIGN KEY (id_tweet) REFERENCES tweet (id_tweet)
 );
+
+CREATE TABLE comments (
+    id_comment SERIALIZABLE PRIMARY KEY,
+    id_user VARCHAR(10),
+    id_tweet SERIALIZABLE,
+    comment_text VARCHAR(140),
+    FOREIGN KEY (id_user) REFERENCES users (id_user),
+    FOREIGN key (id_tweet) REFERENCES tweet (id_tweet),
+)
