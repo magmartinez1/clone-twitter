@@ -1,16 +1,26 @@
-import { Client } from 'pg'
-
-const obtenerUsuarios = async () => {
-    const client = new Client()
-    await client.connect()
+import pkg from 'pg';
+const { Pool, Client } = pkg;
  
-    const res = await client.query('SELECT* FROM users', ['Hello world!'])
-    const result = res.rows[0].message;
-    await client.end();
-
-    return result;
-}
-
-obtenerUsuarios().then(result => {
-    console.log(result);
-});
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'midb',
+  password: 'mi_contra',
+  port: 5432,
+})
+ 
+console.log(await pool.query('SELECT* FROM users'))
+ 
+const client = new Client({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'midb',
+  password: 'mi_contra',
+  port: 5432,
+})
+ 
+await client.connect()
+ 
+console.log(await client.query('SELECT* FROM users'))
+ 
+await client.end()
