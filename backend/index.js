@@ -1,6 +1,7 @@
 import express from 'express';
 import pkg from 'pg';
 import jwt from 'jsonwebtoken';
+import bodyParser from 'body-parser';
 
 const { Pool, Client } = pkg;
 const app = express();
@@ -14,16 +15,17 @@ const pool = new Pool({
 });
 
 app.use(express.json());
+app.use(bodyParser.json());
 
 app.get('/users', async (req, res) => {
-    const result = await pool.query('SELECT id_u, user_name, name, surname, email FROM users');
+    const result = await pool.query('SELECT id_user, user_name, name, surname, email FROM users');
     res.json(result.rows);
     console.log(result);
 });
 
-app.get('/users/:id_u', async(req, res) => {
-    const { id_u } = req.params;
-    const result = await pool.query('SELECT id_1, user_name, name, surname, email FROM users WHERE id_u = $1', [id_u]);
+app.get('/users/:id_user', async(req, res) => {
+    const { id_user } = req.params;
+    const result = await pool.query('SELECT id_user, user_name, name, surname, email FROM users WHERE id_user = $1', [id_user]);
     res.json(result.rows);    
 });
 
@@ -62,49 +64,160 @@ app.get('/comments/:id_comment', async(req, res) => {
     const result = await pool.query('SELECT * FROM comments WHERE id_comment = $1', [id_comment]);
     res.json(result.rows);    
 });
-/*
+
+app.post('/tweets/:id_tweet/comments', ensureToken, async (req, res) => {
+    const tweetId = req.params.id_tweet;
+    const user = req.user.id_user;
+    const commentText = req.body.com_text;
+    try{
+        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1', [tweetId]);
+         if (tweetData.rows.length === 0) {
+             return res.status(403).json({ error: 'El tweet no existe'});
+        }
+        const result = await pool.query('INSERT INTO comments (id_tweet, id_user, com_text) VALUES ($1, $2, $3) RETURNING *', [tweetId, user, commentText]);
+        const comment = result.rows;
+        res.status(200).json({ comment });
+    } catch (error){
+        console.log('Error al agregar el comentario', error);
+        res.status(403).json({ error })
+    }
+    
+});
+
+app.post('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
+    const tweetId = req.params.id_tweet;
+    const user = req.user.id_user;
+    try{
+        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
+        if(tweetData.rows.length === 0) {
+            return res.status(403).json({ error: 'El tweet no existe'});
+        }
+
+        const likeData = await pool.query('SELECT * FROM likes WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
+        if(likeData.rows.length > 0){
+            return res.status(403).json({error: 'Ya le has dado like a este tweet'});
+        }
+
+        const result = await pool.query('INSERT INTO likes (id_tweet, id_user) VALUES ($1, $2) RETURNING *', [tweetId, user]);
+        const newLike = result.rows;
+        
+        res.status(200).json({ like: newLike });
+    } catch (error) {
+        console.log('Error al dar like al tweet', error);
+        res.status(403).json({error});
+    }
+});
+ 
+
 app.post('/users/', async (req, res) => {  
     const { user_name, name, surname, email, password } = req.body;    
     if (!user_name || !name || !surname || !email || !password) return res.status(403).json({ error: 'Faltan datos'});
-    const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4)', [user_name, name, surname, email, password]);
+    const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4, $5)', [user_name, name, surname, email, password]);
     res.status(200).json({ user: result.rows });    
+    console.log(res);
 }); 
-*/
+
 
 app.post('/tweets', ensureToken, async(req, res) => {
-    const user = req.user_name;
+    const user = req.user.id_user;
     const tweet = req.body.tweet;
+    
     try{
-    if (user.id_u) {
-       const userId = user.id_u;
-    } else if (user.user_name) {
-        const userData = await pool.query('SELECT id_u FROM users WHERE user_name = $1', [user.user_name]);
-        if (userData.rows.length === 0) {
-            return res.status(404).json({ error: 'Usuario no encontrado' });
+        const userData = await pool.query('SELECT user_name FROM users WHERE id_user = $1', [user]);
+        if (userData.rows.length === 0){
+         return res.status(403).json({ error: 'Usuario no encontrado' });
         }
-        const userId = userData.rows[0].id_u;
+
+        const result = await pool.query('INSERT INTO tweets (id_user, tweet) VALUES ($1, $2) RETURNING *', [user, tweet]);
+        res.status(201).json({ tweet: result.rows[0] });
+    } catch (error) {
+        console.error('Error al crear el tweet:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
-    const result = await pool.query('INSERT INTO tweets (user_id, content) VALUES ($1, $2) RETURNING *', [userId, tweet]);
-    res.status(201).json({ tweet: result.rows[0] });
-} catch (error) {
-    console.error('Error al crear el tweet:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-}
+    console.log(req.user);
+});
+
+app.delete('/tweets/:id_tweet', async (req, res) => {
+    const id_tweet = req.params.id_tweet;
+    try{
+        const delQ = 'DELETE FROM tweets WHERE id_tweet = $1';
+        const result = await pool.query(delQ, [id_tweet]);
+        res.status(200).json({ message: 'El tweet se ha eliminado correctamente' });   
+    } catch {
+        res.status(403).json({ error: 'Error al eliminar el tweet' });
+    }
+    
+});
+
+app.delete('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
+    const tweetId = req.params.id_tweet;
+    const user = req.user.id_user;
+    try{
+        const likeData = await pool.query('SELECT * FROM likes WHERE id_tweet= $1 AND id_user =$2', [tweetId, user]);
+        if(likeData.rows.length === 0) {
+            return res.status(403).json({ error: 'No has dado like a este tweet'});
+        }
+
+        const result = await pool.query('DELETE FROM likes WHERE id_tweet =$1 AND id_user =$2', [tweetId, user]);
+        res.status(200).json({message : 'Has quitado el like correctamente'});
+
+    } catch (error) {
+        console.log('Error al quitar el like al tweet', error);
+        res.status(403).json({ error });
+    }
 });
 
 app.put('/users/:id_u', async (req, res) => {
-    const id_u = req.params.id_u;
+    const id_user = req.params.id_user;
     const update = req.body;
-    const updateQ = 'UPDATE users SET email = $1, password = $2 WHERE id_u = $3';
+    const updateQ = 'UPDATE users SET email = $1, password = $2 WHERE id_user = $3';
     const result = await pool.query(updateQ, [update.email, update.password, id_u]);
     res.status(200).json({message: 'El usuario se ha modificado correctamente.'});
 });
 
-app.delete('/users/:id_u', async (req, res) => {
-    const id_u = req.params.id_u;
+app.put('/tweets/:id_tweet', ensureToken, async (req, res) => {
+    const tweetId = req.params.id_tweet;
+    const newText = req.body.newText;
+    const user = req.user.id_user;
+    
     try{
-        const delQ = 'DELETE FROM users WHERE id_u = $1';
-        const result = await pool.query(delQ, [id_u]);
+        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
+        if(tweetData.rows.length === 0){
+            return res.status(403).json({ error: 'No puedes modificar este tweet'});
+        }
+        const result = await pool.query('UPDATE tweets SET tweet = $1 WHERE id_tweet = $2 RETURNING *', [newText, tweetId]);
+        const updateTweet = result.rows;
+        res.status(200).json({ tweet: updateTweet});
+        
+    } catch (error){
+        console.log('Error al modificar el tweet', error);
+        res.status(403).json({error});
+    }
+});
+
+app.put('/comments/:id_comment', ensureToken, async (req, res) => {
+    const commentId = req.params.id_comment;
+    const newText = req.body.newText;
+    const user = req.user.id_user;
+    try{
+        const comData = await pool.query('SELECT * FROM comments WHERE id_comment =$1 AND id_user = $2', [commentId, user]);
+        if(comData.rows.length === 0) {
+            return res.status(403).json({ error: 'No puedes modificar el comentario'});
+        }
+        const result = await pool.query('UPDATE comments SET com_text =$1 WHERE id_comment = $2 RETURNING*', [newText, commentId]);
+        const updateC = result.rows;
+        res.status(200).json({ comment: updateC });
+    } catch (error){
+        console.log('Error al modificar el comentario');
+        res.status(403).json({ error });
+    }
+});
+
+app.delete('/users/:id_u', async (req, res) => {
+    const id_user = req.params.id_user;
+    try{
+        const delQ = 'DELETE FROM users WHERE id_user = $1';
+        const result = await pool.query(delQ, [id_user]);
         res.status(200).json({ message: 'El usuario se ha eliminado correctamente' });   
     } catch {
         res.status(403).json({ error: 'Error al eliminar el usuario' });
@@ -118,16 +231,17 @@ app.post('/users', async (req, res) => {
     if (!user_name || !password){
     	return res.status(403).json({ error: 'Credenciales incorrectas' });
     }
-    const query = 'SELECT * FROM users WHERE user_name = $1 AND password = $2';
-    const result = await pool.query(query, [user_name, password]);
+     const query = 'SELECT * FROM users WHERE user_name = $1 AND password = $2';
+     const result = await pool.query(query, [user_name, password]);
     
     if (result.rows.length === 1) {
-    const user = {user_name};
-    const token = jwt.sign({user}, 'my_secret_key');
+     const user = {id_user, user_name};
+     const token = jwt.sign({user}, 'my_secret_key');
      return res.status(200).json({ token: token });
-    } else {
+    } 
+    else {
         return res.status(403).json({ error: 'Credenciales incorrectas' });
-      } 
+     } 
 });
 
 async function ensureToken(req, res, next) {
