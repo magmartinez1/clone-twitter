@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { login } from '/api';
 
 const Login = () => {
-    const [username, setUsername] = useState('');
+    const [user_name, setUsername] = useState('');
     const [password, setPassword] = useState('');
   
     const handleLogin = async (event) => {
       event.preventDefault();
       try {
-        const response = await login(username, password);
+        const response = await login(user_name, password);
         console.log('Respuesta del servidor:', response);
-        // Aquí puedes manejar la respuesta del servidor, por ejemplo, redireccionar al usuario si el inicio de sesión es exitoso.
+        
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
-        // Aquí puedes manejar el error, por ejemplo, mostrar un mensaje de error al usuario.
       }
     };
   
