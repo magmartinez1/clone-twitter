@@ -31,7 +31,13 @@ export const createTweet = async (tweet) => {
         body: JSON.stringify({ tweet }),
       });
       const data = await response.json();
-      return data;
+      const newTweetId = data.tweet.id;
+      const newTweetResponse = await fetch(`${API_URL}/tweets/${newTweetId}`);
+      const newTweetData = await newTweetResponse.json();
+
+      console.log('Tweet recién creado:', newTweetData);
+
+        return data;
     } catch (error) {
       console.error('Error al crear el tweet:', error);
       throw error;
