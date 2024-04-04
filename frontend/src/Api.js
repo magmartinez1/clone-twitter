@@ -37,3 +37,20 @@ export const createTweet = async (tweet) => {
       throw error;
     }
   };
+
+  export const createComment = async (comment) => {
+    try {
+      const response = await fetch(`${API_URL}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ comment }),
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error al crear el comentario:', error);
+      throw error;
+    }
+  };

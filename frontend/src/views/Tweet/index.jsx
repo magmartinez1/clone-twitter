@@ -28,6 +28,7 @@ const CrearTweet = () => {
           />
         </div>
         <button type="submit">Crear Tweet</button>
+        <button type="submit">Crear Comentario</button>
       </form>
     </div>
   );
