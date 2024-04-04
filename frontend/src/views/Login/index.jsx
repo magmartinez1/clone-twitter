@@ -4,11 +4,13 @@ import { login } from '../../Api.js';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    console.log('Estoy iniciando sesión');
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
             const response = await login(username, password);
+            console.log('El usuario intro es: ', username);
+            console.log('El usuario intro es: ', password);
             console.log('Respuesta del servidor:', response);
 
         } catch (error) {

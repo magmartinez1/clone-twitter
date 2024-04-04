@@ -7,6 +7,7 @@ const CrearTweet = () => {
 
   const handleCrearTweet = async (event) => {
     event.preventDefault();
+    console.log('Estoy por crearlo');
     try {
       const response = await createTweet(tweet);
       console.log('Respuesta del servidor:', response);

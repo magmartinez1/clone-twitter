@@ -2,6 +2,7 @@ import express from 'express';
 import pkg from 'pg';
 import jwt from 'jsonwebtoken';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const { Pool, Client } = pkg;
 const app = express();
@@ -16,6 +17,11 @@ const pool = new Pool({
 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cors({ 
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+ }));
 
 app.get('/users', async (req, res) => {
     const result = await pool.query('SELECT id_user, user_name, name, surname, email FROM users');
@@ -121,7 +127,9 @@ app.post('/users/', async (req, res) => {
 app.post('/tweets', ensureToken, async(req, res) => {
     const user = req.user.id_user;
     const tweet = req.body.tweet;
-    
+    console.log('me esta mostrando este usuario:', req.user.id_user);
+    console.log('me esta mostrando este body:', req.body.tweet);
+
     try{
         const userData = await pool.query('SELECT user_name FROM users WHERE id_user = $1', [user]);
         if (userData.rows.length === 0){
@@ -225,17 +233,16 @@ app.delete('/users/:id_u', async (req, res) => {
     
 });
 
-app.post('/users', async (req, res) => {
+app.post('/login', async (req, res) => {
     const {user_name, password} = req.body;
     
     if (!user_name || !password){
     	return res.status(403).json({ error: 'Credenciales incorrectas' });
     }
-     const query = 'SELECT * FROM users WHERE user_name = $1 AND password = $2';
-     const result = await pool.query(query, [user_name, password]);
+     const result = await pool.query('SELECT * FROM users WHERE user_name = $1 AND password = $2', [user_name, password]);
     
     if (result.rows.length === 1) {
-     const user = {id_user, user_name};
+     const user = {user_name};
      const token = jwt.sign({user}, 'my_secret_key');
      return res.status(200).json({ token: token });
     } 
@@ -268,6 +275,7 @@ app.get('/protected', ensureToken, async (req, res) => {
         user: req.user
     });
 });
+
 
 const PORT = 3000;
 
