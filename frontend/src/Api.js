@@ -10,7 +10,11 @@ export const login = async (username, password) => {
             body: JSON.stringify({ username, password }),
         });
         const data = await response.json();
-        return data;
+        if(data.token){
+          localStorage.setItem('token', data.token);
+        } else{
+            console.error('Error al guardar el token');
+        }
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         throw error;
