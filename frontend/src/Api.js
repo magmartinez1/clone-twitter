@@ -19,4 +19,21 @@ export const login = async (username, password) => {
 
 export const register = async (completarVariables) => {
     alert(completarVariables);
-}
+};
+
+export const createTweet = async (tweet) => {
+    try {
+      const response = await fetch(`${API_URL}/tweets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tweet }),
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error al crear el tweet:', error);
+      throw error;
+    }
+  };
