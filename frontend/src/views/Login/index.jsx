@@ -4,15 +4,21 @@ import { login } from '../../Api.js';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [token, setToken] = useState(null); 
+
     console.log('Estoy iniciando sesión');
+
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
             const response = await login(username, password);
-            console.log('El usuario intro es: ', username);
-            console.log('El usuario intro es: ', password);
             console.log('Respuesta del servidor:', response);
-
+            if (response && response.token) {
+                setToken(response.token);
+                console.log('Token guardado:', response.token);
+            } else {
+                console.error('El servidor no devolvió un token válido.');
+            }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
         }

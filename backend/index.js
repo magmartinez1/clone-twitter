@@ -244,6 +244,7 @@ app.post('/login', async (req, res) => {
     if (result.rows.length === 1) {
      const user = {user_name};
      const token = jwt.sign({user}, 'my_secret_key');
+     console.log('Token generado:', token);
      return res.status(200).json({ token: token });
     } 
     else {
