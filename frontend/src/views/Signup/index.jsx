@@ -11,7 +11,12 @@ const Registro = () => {
   const handleRegister = async (event) => {
     event.preventDefault();
     try {
-      const response = await register({ username, name, surname, email, password });
+      const userData = { username, name, surname, email, password };
+      const response = await register(userData);
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        console.log('Token guardado:', response.token);
+      }
       console.log('Respuesta del servidor:', response);
     } catch (error) {
       console.error('Error al registrar usuario:', error);

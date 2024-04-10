@@ -42,6 +42,12 @@ export const register = async (userData) => {
         }
 
         const data = await response.json();
+        if(data.token){
+          localStorage.setItem('token', data.token);
+          console.log('Token guardado:', data.token);
+        } else{
+            console.error('Error al guardar el token');
+        }
         console.log('Registro completado:', data);
         return data;
     } catch (error) {
