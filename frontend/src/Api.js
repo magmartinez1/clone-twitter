@@ -30,7 +30,7 @@ export const login = async (username, password) => {
 
 export const register = async (userData) => {
     try {
-        const response = await fetch(`${API_URL}/register`, {
+        const response = await fetch(`${API_URL}/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -95,3 +95,4 @@ export const createTweet = async (tweet) => {
       throw error;
     }
   };
+
