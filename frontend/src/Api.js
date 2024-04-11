@@ -84,10 +84,12 @@ export const createTweet = async (tweet) => {
 
   export const createComment = async (comment) => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ comment }),
       });
