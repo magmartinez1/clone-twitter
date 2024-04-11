@@ -59,10 +59,12 @@ export const register = async (userData) => {
 
 export const createTweet = async (tweet) => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/tweets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ tweet }),
       });
