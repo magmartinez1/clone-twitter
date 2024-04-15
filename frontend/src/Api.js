@@ -2,14 +2,14 @@ const API_URL = 'http://localhost:3000';
 
 const token = localStorage.getItem('token');
 
-export const login = async (username, password) => {
+export const login = async (user_name, password) => {
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ user_name, password }),
         });
         if (!response.ok) {
             throw new Error('Error al iniciar sesión');
@@ -69,7 +69,7 @@ export const createTweet = async (tweet) => {
         body: JSON.stringify({ tweet }),
       });
       const data = await response.json();
-      const newTweetId = data.tweet.id;
+      const newTweetId = data.tweet.id_tweet;
       const newTweetResponse = await fetch(`${API_URL}/tweets/${newTweetId}`);
       const newTweetData = await newTweetResponse.json();
 

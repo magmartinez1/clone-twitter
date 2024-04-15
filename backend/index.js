@@ -115,12 +115,17 @@ app.post('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
 });
  
 
-app.post('/users/', async (req, res) => {  
-    const { user_name, name, surname, email, password } = req.body;    
-    if (!user_name || !name || !surname || !email || !password) return res.status(403).json({ error: 'Faltan datos'});
-    const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4, $5)', [user_name, name, surname, email, password]);
-    res.status(200).json({ user: result.rows });    
-    console.log(res);
+app.post('/users', async (req, res) => {  
+   try{
+        const { user_name, name, surname, email, password } = req.body; 
+        console.log(req.body);   
+        if (!user_name || !name || !surname || !email || !password) return res.status(403).json({ error: 'Faltan datos'});
+        const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4, $5)', [user_name, name, surname, email, password]);
+        res.status(200).json({ user: result.rows });  
+   } catch (error) {
+        console.log('Error al crear el usuario', error);
+        res.status(500).json({ error: 'Error del servidor'});
+   } 
 }); 
 
 
