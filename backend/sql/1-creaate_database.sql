@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id_user SERIALIZABLE PRIMARY KEY,
+    id_user SERIAL PRIMARY KEY,
     user_name VARCHAR (10),
     name VARCHAR(50),
     surname VARCHAR(50),
@@ -9,26 +9,26 @@ CREATE TABLE users (
 );
 
 CREATE TABLE tweet (
-    id_tweet SERIALIZABLE PRIMARY KEY,
-    id_user VARCHAR(10),
-    tweet_text VARCHAR(140)
+    id_tweet SERIAL PRIMARY KEY,
+    id_user SERIAL
+    tweet_text VARCHAR(140),
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_user) REFERENCES users (id_user)
 );
 
 CREATE TABLE likes (
-    id_like SERIALIZABLE PRIMARY KEY,
-    id_user VARCHAR(10),
-    id_tweet SERIALIZABLE,
+    id_like SERIAL PRIMARY KEY,
+    id_user SERIAL,
+    id_tweet SERIAL,
     FOREIGN key (id_user) REFERENCES users (id_user),
     FOREIGN KEY (id_tweet) REFERENCES tweet (id_tweet)
 );
 
 CREATE TABLE comments (
-    id_comment SERIALIZABLE PRIMARY KEY,
-    id_user VARCHAR(10),
-    id_tweet SERIALIZABLE,
+    id_comment SERIAL PRIMARY KEY,
+    id_user SERIAL,
+    id_tweet SERIAL,
     comment_text VARCHAR(140),
     FOREIGN KEY (id_user) REFERENCES users (id_user),
-    FOREIGN key (id_tweet) REFERENCES tweet (id_tweet),
+    FOREIGN key (id_tweet) REFERENCES tweet (id_tweet)
 );
