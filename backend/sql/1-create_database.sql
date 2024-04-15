@@ -10,7 +10,7 @@ CREATE TABLE users (
 
 CREATE TABLE tweet (
     id_tweet SERIAL PRIMARY KEY,
-    id_user SERIAL
+    id_user SERIAL,
     tweet_text VARCHAR(140),
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_user) REFERENCES users (id_user)
