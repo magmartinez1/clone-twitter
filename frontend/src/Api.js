@@ -69,6 +69,8 @@ export const createTweet = async (tweet) => {
         body: JSON.stringify({ tweet }),
       });
       const data = await response.json();
+      // TODO verificar que devuelve el servidor antes de usar el dato.
+      console.log(data);
       const newTweetId = data.tweet.id_tweet;
       const newTweetResponse = await fetch(`${API_URL}/tweets/${newTweetId}`);
       const newTweetData = await newTweetResponse.json();
