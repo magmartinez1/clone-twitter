@@ -115,13 +115,19 @@ app.post('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
 });
  
 
-app.post('/users', async (req, res) => {  
-   try{
-        const { user_name, name, surname, email, password } = req.body; 
-        console.log(req.body);   
-        if (!user_name || !name || !surname || !email || !password) return res.status(403).json({ error: 'Faltan datos'});
-        const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4, $5)', [user_name, name, surname, email, password]);
-        res.status(200).json({ user: result.rows });  
+app.post('/users', async (req, res) => {
+    // TODO agregar validacion de duplicados
+    // usuarios ya registrados (email y username tienen que ser unicos)
+    try{
+        // aca decia user_name no username
+        const { username, name, surname, email, password } = req.body;
+        console.log('El body es: ', req.body);
+        if (!username || !name || !surname || !email || !password){
+            console.log('Faltan datos el body es', req.body);
+            return res.status(403).json({ error: 'Faltan datos'});
+        }
+        const result = await pool.query('INSERT INTO users (user_name, name, surname, email, password) VALUES ($1, $2, $3, $4, $5)', [username, name, surname, email, password]);
+        res.status(200).json({ message: 'user created' });
    } catch (error) {
         console.log('Error al crear el usuario', error);
         res.status(500).json({ error: 'Error del servidor'});
@@ -131,6 +137,8 @@ app.post('/users', async (req, res) => {
 
 app.post('/tweets', ensureToken, async(req, res) => {
     const user = req.user.id_user;
+    // TODO mirar que data tiene el token, no tiene el user_id sino el user_name.
+    console.log(req.user);
     const tweet = req.body.tweet;
     console.log('me esta mostrando este usuario:', req.user.id_user);
     console.log('me esta mostrando este body:', req.body.tweet);
@@ -247,7 +255,9 @@ app.post('/login', async (req, res) => {
      const result = await pool.query('SELECT * FROM users WHERE user_name = $1 AND password = $2', [user_name, password]);
     
     if (result.rows.length === 1) {
+     // TODO aca hay que usar la data de la db (variable result), no la que pasa el usuario en el login.
      const user = {user_name};
+     // TODO mirar en el token solo se esta usando el user_name.
      const token = jwt.sign({user}, 'my_secret_key');
      console.log('Token generado:', token);
      return res.status(200).json({ token: token });
