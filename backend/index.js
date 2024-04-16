@@ -117,9 +117,9 @@ app.post('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
 
 app.post('/users', async (req, res) => {
     // TODO agregar validacion de duplicados
-    // usuarios ya registrados (email y username tienen que ser unicos)
+    // usuarios ya registrados (email y username tienen que ser unicos)-ok
     try{
-        // aca decia user_name no username
+        // aca decia user_name no username- unificado username en db 
         const { username, name, surname, email, password } = req.body;
         console.log('El body es: ', req.body);
         if (!username || !name || !surname || !email || !password){
