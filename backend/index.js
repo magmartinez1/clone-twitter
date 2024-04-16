@@ -122,6 +122,16 @@ app.post('/users', async (req, res) => {
         // aca decia user_name no username- unificado username en db 
         const { username, name, surname, email, password } = req.body;
         console.log('El body es: ', req.body);
+
+        const usernameExists = await pool.query('SELECT COUNT(*) FROM users WHERE username = $1', [username]);
+        if (usernameExists.rows[0].count > 0) {
+            return res.status(403).json({ error: 'Usuario no disponible' });
+        }
+        const emailExists = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [email]);
+        if (emailExists.rows[0].count > 0) {
+            return res.status(403).json({ error: 'El correo electrónico ya está registrado' });
+        }
+
         if (!username || !name || !surname || !email || !password){
             console.log('Faltan datos el body es', req.body);
             return res.status(403).json({ error: 'Faltan datos'});
