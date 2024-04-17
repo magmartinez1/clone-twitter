@@ -266,8 +266,8 @@ app.post('/login', async (req, res) => {
     
     if (result.rows.length === 1) {
      // TODO aca hay que usar la data de la db (variable result), no la que pasa el usuario en el login.
-     const id_user = result.rows[0].id_user; //
-     const user = {id_user};
+     //const id_user = result.rows[0].id_user; //
+     const user = {username, password};
      const token = jwt.sign({user}, 'my_secret_key');
      console.log('Token generado:', token);
      return res.status(200).json({ token: token });
@@ -285,7 +285,7 @@ async function ensureToken(req, res, next) {
         try {
             const decoded = jwt.verify(bearerToken, 'my_secret_key');
             console.log(decoded);
-            req.user = decoded.id_user; 
+            req.user = decoded.user; 
             next();
         } catch (error) {
             res.sendStatus(403);
