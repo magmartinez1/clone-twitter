@@ -2,14 +2,14 @@ const API_URL = 'http://localhost:3000';
 
 const token = localStorage.getItem('token');
 
-export const login = async (user_name, password) => {
+export const login = async (username, password) => {
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user_name, password }),
+            body: JSON.stringify({ username, password }),
         });
         if (!response.ok) {
             throw new Error('Error al iniciar sesión');
