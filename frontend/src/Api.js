@@ -60,7 +60,7 @@ export const register = async (userData) => {
 export const createTweet = async (tweet) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/tweets`, {
+      const response = await fetch(`${API_URL}/tweet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const createTweet = async (tweet) => {
       });
       const data = await response.json();
       const newTweetId = data.tweet.id_tweet;
-      const newTweetResponse = await fetch(`${API_URL}/tweets/${newTweetId}`);
+      const newTweetResponse = await fetch(`${API_URL}/tweet/${newTweetId}`);
       const newTweetData = await newTweetResponse.json();
 
       console.log('Tweet recién creado:', newTweetData);

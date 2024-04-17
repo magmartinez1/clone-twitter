@@ -35,15 +35,15 @@ app.get('/users/:id_user', async(req, res) => {
     res.json(result.rows);    
 });
 
-app.get('/tweets', async (req, res) => {
-    const result = await pool.query('SELECT * FROM tweets');
+app.get('/tweet', async (req, res) => {
+    const result = await pool.query('SELECT * FROM tweet');
     res.json(result.rows);
     console.log(result);
 });
 
-app.get('/tweets/:id_tweet', async(req, res) => {
+app.get('/tweet/:id_tweet', async(req, res) => {
     const { id_tweet } = req.params;
-    const result = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1', [id_tweet]);
+    const result = await pool.query('SELECT * FROM tweet WHERE id_tweet = $1', [id_tweet]);
     res.json(result.rows);    
 });
 
@@ -71,12 +71,12 @@ app.get('/comments/:id_comment', async(req, res) => {
     res.json(result.rows);    
 });
 
-app.post('/tweets/:id_tweet/comments', ensureToken, async (req, res) => {
+app.post('/tweet/:id_tweet/comments', ensureToken, async (req, res) => {
     const tweetId = req.params.id_tweet;
     const user = req.user.id_user;
     const commentText = req.body.com_text;
     try{
-        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1', [tweetId]);
+        const tweetData = await pool.query('SELECT * FROM tweet WHERE id_tweet = $1', [tweetId]);
          if (tweetData.rows.length === 0) {
              return res.status(403).json({ error: 'El tweet no existe'});
         }
@@ -90,11 +90,11 @@ app.post('/tweets/:id_tweet/comments', ensureToken, async (req, res) => {
     
 });
 
-app.post('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
+app.post('/tweet/:id_tweet/likes', ensureToken, async (req, res) => {
     const tweetId = req.params.id_tweet;
     const user = req.user.id_user;
     try{
-        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
+        const tweetData = await pool.query('SELECT * FROM tweet WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
         if(tweetData.rows.length === 0) {
             return res.status(403).json({ error: 'El tweet no existe'});
         }
@@ -145,7 +145,7 @@ app.post('/users', async (req, res) => {
 }); 
 
 
-app.post('/tweets', ensureToken, async(req, res) => {
+app.post('/tweet', ensureToken, async(req, res) => {
     const user = req.user.id_user;
     // TODO mirar que data tiene el token, no tiene el user_id sino el user_name.- ya tiene el id_user
     console.log(req.user);
@@ -159,7 +159,7 @@ app.post('/tweets', ensureToken, async(req, res) => {
          return res.status(403).json({ error: 'Usuario no encontrado' });
         }
 
-        const result = await pool.query('INSERT INTO tweets (id_user, tweet) VALUES ($1, $2) RETURNING *', [user, tweet]);
+        const result = await pool.query('INSERT INTO tweet (id_user, tweet) VALUES ($1, $2) RETURNING *', [user, tweet]);
         res.status(201).json({ tweet: result.rows[0] });
     } catch (error) {
         console.error('Error al crear el tweet:', error);
@@ -168,10 +168,10 @@ app.post('/tweets', ensureToken, async(req, res) => {
     console.log(req.user);
 });
 
-app.delete('/tweets/:id_tweet', async (req, res) => {
+app.delete('/tweet/:id_tweet', async (req, res) => {
     const id_tweet = req.params.id_tweet;
     try{
-        const delQ = 'DELETE FROM tweets WHERE id_tweet = $1';
+        const delQ = 'DELETE FROM tweet WHERE id_tweet = $1';
         const result = await pool.query(delQ, [id_tweet]);
         res.status(200).json({ message: 'El tweet se ha eliminado correctamente' });   
     } catch {
@@ -180,7 +180,7 @@ app.delete('/tweets/:id_tweet', async (req, res) => {
     
 });
 
-app.delete('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
+app.delete('/tweet/:id_tweet/likes', ensureToken, async (req, res) => {
     const tweetId = req.params.id_tweet;
     const user = req.user.id_user;
     try{
@@ -198,7 +198,7 @@ app.delete('/tweets/:id_tweet/likes', ensureToken, async (req, res) => {
     }
 });
 
-app.put('/users/:id_u', async (req, res) => {
+app.put('/users/:id_user', async (req, res) => {
     const id_user = req.params.id_user;
     const update = req.body;
     const updateQ = 'UPDATE users SET email = $1, password = $2 WHERE id_user = $3';
@@ -206,17 +206,17 @@ app.put('/users/:id_u', async (req, res) => {
     res.status(200).json({message: 'El usuario se ha modificado correctamente.'});
 });
 
-app.put('/tweets/:id_tweet', ensureToken, async (req, res) => {
+app.put('/tweet/:id_tweet', ensureToken, async (req, res) => {
     const tweetId = req.params.id_tweet;
     const newText = req.body.newText;
     const user = req.user.id_user;
     
     try{
-        const tweetData = await pool.query('SELECT * FROM tweets WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
+        const tweetData = await pool.query('SELECT * FROM tweet WHERE id_tweet = $1 AND id_user = $2', [tweetId, user]);
         if(tweetData.rows.length === 0){
             return res.status(403).json({ error: 'No puedes modificar este tweet'});
         }
-        const result = await pool.query('UPDATE tweets SET tweet = $1 WHERE id_tweet = $2 RETURNING *', [newText, tweetId]);
+        const result = await pool.query('UPDATE tweet SET tweet = $1 WHERE id_tweet = $2 RETURNING *', [newText, tweetId]);
         const updateTweet = result.rows;
         res.status(200).json({ tweet: updateTweet});
         
@@ -244,7 +244,7 @@ app.put('/comments/:id_comment', ensureToken, async (req, res) => {
     }
 });
 
-app.delete('/users/:id_u', async (req, res) => {
+app.delete('/users/:id_user', async (req, res) => {
     const id_user = req.params.id_user;
     try{
         const delQ = 'DELETE FROM users WHERE id_user = $1';
