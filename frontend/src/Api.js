@@ -101,3 +101,18 @@ export const createTweet = async (tweet) => {
     }
   };
 
+  export const getUserProfile = async (id_user) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/users/${id_user}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener el perfil del usuario:', error);
+      throw error;
+    }
+  };
+
