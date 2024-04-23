@@ -18,11 +18,10 @@ export const login = async (username, password) => {
         const data = await response.json();
         console.log(data);
         if(data.token){
-          localStorage.setItem('token', data.token);
-          console.log('Token guardado:', data.token);
-        } else{
-            console.error('Error al guardar el token');
-        }
+          throw new Error('El servidor no devolvió un token válido');
+        } 
+        localStorage.setItem('token', data.token);
+        console.log('Token guardado:', data.token);
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         throw error;
@@ -101,18 +100,12 @@ export const createTweet = async (tweet) => {
     }
   };
 
-  export const getUserProfile = async (id_user) => {
+  export async function getUserProfile(id_user) {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/users/${id_user}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-        },
-      });
+      const response = await axios.get(`/users/${id_user}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener el perfil del usuario:', error);
-      throw error;
+      throw new Error('No se pudo obtener el perfil del usuario');
     }
-  };
+  }
 
